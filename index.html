@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>استعلام عن لجنة الاختبار - ثانوية سعد بن عبادة</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Cairo', sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; text-align: center; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; font-size: 22px; }
+        input { width: 90%; padding: 12px; margin: 15px 0; border: 2px solid #3498db; border-radius: 8px; font-size: 16px; outline: none; }
+        .result-card { display: none; margin-top: 20px; padding: 20px; border-radius: 10px; background: #ecf0f1; border-right: 5px solid #3498db; text-align: right; }
+        .result-card p { margin: 10px 0; font-size: 18px; color: #34495e; }
+        .result-card span { font-weight: bold; color: #2980b9; }
+        .no-result { color: #e74c3c; display: none; margin-top: 15px; }
+        .footer { margin-top: 20px; font-size: 12px; color: #7f8c8d; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <img src="https://upload.wikimedia.org/wikipedia/ar/archive/0/00/20211110190130%21Ministry_of_Education_Saudi_Arabia.png" width="120" alt="وزارة التعليم">
+    <h1>ثانوية سعد بن عبادة بالقوز</h1>
+    <p>أدخل اسمك أو رقم جلوسك لمعرفة لجنتك وموقعها</p>
+    
+    <input type="text" id="searchInput" placeholder="اكتب اسم الطالب هنا..." onkeyup="searchStudent()">
+    
+    <div id="result" class="result-card">
+        <p>اسم الطالب: <span id="resName"></span></p>
+        <p>رقم الجلوس: <span id="resID"></span></p>
+        <p>الصف: <span id="resGrade"></span></p>
+        <p>رقم اللجنة: <span id="resRoom"></span></p>
+        <p>مقر اللجنة: <span id="resLoc"></span></p>
+        <p>الطابق: <span id="resFloor"></span></p>
+    </div>
+    
+    <p id="noResult" class="no-result">عذراً، لم يتم العثور على بيانات بهذا الاسم.</p>
+    
+    <div class="footer">وزارة التعليم - المملكة العربية السعودية</div>
+</div>
+
+<script>
+// البيانات المستخرجة من الكشوفات المرفقة
+const committeeInfo = {
+    "1": { loc: "الأول أ", floor: "الأول" },
+    "2": { loc: "الأول ب", floor: "الأول" },
+    "3": { loc: "الأول ج", floor: "الأول" },
+    "4": { loc: "الثاني أ", floor: "الأول" },
+    "5": { loc: "مركز مصادر التعلم", floor: "الأول" },
+    "6": { loc: "الثاني ب", floor: "الأول" },
+    "7": { loc: "الثالث أ", floor: "الأول" },
+    "8": { loc: "الثالث ب", floor: "الأول" },
+    "9": { loc: "قاعة الدراسات الاجتماعية", floor: "الثاني" },
+    "10": { loc: "قاعة الفيزياء", floor: "الثاني" },
+    "11": { loc: "قاعة الكيمياء", floor: "الثاني" },
+    "12": { loc: "قاعة الأحياء", floor: "الثاني" }
+};
+
+const students = [
+    { id: "1001", name: "أحمد علي احمد الناشري", grade: "الأول الثانوي", room: "1" },
+    { id: "1002", name: "أسامة عبدالله محمد الكريمي العذيقي", grade: "الأول الثانوي", room: "1" },
+    { id: "3001", name: "ابراهيم علي عبده المقعدي", grade: "الثالث الثانوي", room: "2" },
+    { id: "1022", name: "خلف حسين محمد العذيقي", grade: "الأول الثانوي", room: "3" },
+    { id: "2001", name: "أحمد ابو طالب ابن نافع القداح", grade: "الثاني الثانوي", room: "9" },
+    { id: "2014", name: "حسن عمر ابن ابوطالب العمري", grade: "الثاني الثانوي", room: "10" },
+    { id: "2025", name: "طلال علي عبدالله الفقيه", grade: "الثاني الثانوي", room: "11" },
+    { id: "2013", name: "حسن علي ابن يحيى المقعدي", grade: "الثاني الثانوي", room: "12" }
+    // يمكن إضافة باقي الطلاب هنا بنفس النمط
+];
+
+function searchStudent() {
+    let input = document.getElementById('searchInput').value.trim();
+    let resultDiv = document.getElementById('result');
+    let noResult = document.getElementById('noResult');
+    
+    if (input.length < 3) {
+        resultDiv.style.display = 'none';
+        noResult.style.display = 'none';
+        return;
+    }
+
+    let found = students.find(s => s.name.includes(input) || s.id === input);
+
+    if (found) {
+        document.getElementById('resName').innerText = found.name;
+        document.getElementById('resID').innerText = found.id;
+        document.getElementById('resGrade').innerText = found.grade;
+        document.getElementById('resRoom').innerText = found.room;
+        document.getElementById('resLoc').innerText = committeeInfo[found.room].loc;
+        document.getElementById('resFloor').innerText = committeeInfo[found.room].floor;
+        
+        resultDiv.style.display = 'block';
+        noResult.style.display = 'none';
+    } else {
+        resultDiv.style.display = 'none';
+        noResult.style.display = 'block';
+    }
+}
+</script>
+
+</body>
+</html>
